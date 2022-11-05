@@ -81,14 +81,8 @@ func (p Terminal) read() (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("error: read: %w", err)
 		}
-		if n == 0 {
-			p.logger.Printf("read: EOF, return")
-			break
-		}
-		if strings.Contains(string(buff[:n]), "\r") {
-			p.logger.Printf("read: line break, return")
-			break
+		if n == 0 || strings.Contains(string(buff[:n]), "\r") {
+			return strings.TrimSpace(string(buff[:n])), nil
 		}
 	}
-	return strings.TrimSpace(string(buff)), nil
 }
