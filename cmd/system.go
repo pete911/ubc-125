@@ -12,22 +12,22 @@ var (
 	systemVolume = &cobra.Command{
 		Use:   "volume",
 		Short: "volume level",
-		Run:   systemVolumeCmdRun,
+		RunE:  systemVolumeCmdRunE,
 	}
 	systemSquelch = &cobra.Command{
 		Use:   "squelch",
 		Short: "squelch level",
-		Run:   systemSquelchCmdRun,
+		RunE:  systemSquelchCmdRunE,
 	}
 	systemContrast = &cobra.Command{
 		Use:   "contrast",
 		Short: "lcd contrast level",
-		Run:   systemContrastCmdRun,
+		RunE:  systemContrastCmdRunE,
 	}
 	systemWeather = &cobra.Command{
 		Use:   "weather",
 		Short: "weather priority",
-		Run:   systemWeatherAlertCmdRun,
+		RunE:  systemWeatherAlertCmdRunE,
 	}
 )
 
@@ -38,42 +38,82 @@ func init() {
 	systemCmd.AddCommand(systemWeather)
 }
 
-func systemVolumeCmdRun(_ *cobra.Command, _ []string) {
-	term := Terminal()
+func systemVolumeCmdRunE(_ *cobra.Command, _ []string) error {
+	term, err := Terminal()
+	if err != nil {
+		return err
+	}
 	defer term.Close()
 
 	cmd := "VOL"
-	defaultVolume := term.Write(cmd)
-	volume := SelectNum("select volume", 0, 15, defaultVolume)
-	term.Write(cmd, volume)
+	defaultVolume, err := term.WriteE(cmd)
+	if err != nil {
+		return err
+	}
+	volume, err := SelectNum("select volume", 0, 15, defaultVolume)
+	if err != nil {
+		return err
+	}
+	_, err = term.WriteE(cmd, volume)
+	return err
 }
 
-func systemSquelchCmdRun(_ *cobra.Command, _ []string) {
-	term := Terminal()
+func systemSquelchCmdRunE(_ *cobra.Command, _ []string) error {
+	term, err := Terminal()
+	if err != nil {
+		return err
+	}
 	defer term.Close()
 
 	cmd := "SQL"
-	defaultSquelch := term.Write(cmd)
-	squelch := SelectNum("select squelch (0 - open, 15 - close)", 0, 15, defaultSquelch)
-	term.Write(cmd, squelch)
+	defaultSquelch, err := term.WriteE(cmd)
+	if err != nil {
+		return err
+	}
+	squelch, err := SelectNum("select squelch (0 - open, 15 - close)", 0, 15, defaultSquelch)
+	if err != nil {
+		return err
+	}
+	_, err = term.WriteE(cmd, squelch)
+	return err
 }
 
-func systemContrastCmdRun(_ *cobra.Command, _ []string) {
-	term := Terminal()
+func systemContrastCmdRunE(_ *cobra.Command, _ []string) error {
+	term, err := Terminal()
+	if err != nil {
+		return err
+	}
 	defer term.Close()
 
 	cmd := "CNT"
-	defaultContrast := term.Write(cmd)
-	contrast := SelectNum("select lcd contrast", 1, 15, defaultContrast)
-	term.Write(cmd, contrast)
+	defaultContrast, err := term.WriteE(cmd)
+	if err != nil {
+		return err
+	}
+	contrast, err := SelectNum("select lcd contrast", 1, 15, defaultContrast)
+	if err != nil {
+		return err
+	}
+	_, err = term.WriteE(cmd, contrast)
+	return err
 }
 
-func systemWeatherAlertCmdRun(_ *cobra.Command, _ []string) {
-	term := Terminal()
+func systemWeatherAlertCmdRunE(_ *cobra.Command, _ []string) error {
+	term, err := Terminal()
+	if err != nil {
+		return err
+	}
 	defer term.Close()
 
 	cmd := "WXS"
-	defaultAlert := term.Write(cmd)
-	alert := SelectNum("select weather alert (0 - off, 1 - on)", 0, 1, defaultAlert)
-	term.Write(cmd, alert)
+	defaultAlert, err := term.WriteE(cmd)
+	if err != nil {
+		return err
+	}
+	alert, err := SelectNum("select weather alert (0 - off, 1 - on)", 0, 1, defaultAlert)
+	if err != nil {
+		return err
+	}
+	_, err = term.WriteE(cmd, alert)
+	return err
 }

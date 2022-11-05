@@ -38,34 +38,37 @@ func initLog(verbose bool) {
 	}
 }
 
-func Terminal() port.Terminal {
-	return port.NewTerminal(logger, openPort())
+func Terminal() (port.Terminal, error) {
+	p, err := openPort()
+	if err != nil {
+		return port.Terminal{}, err
+	}
+	return port.NewTerminal(logger, p)
 }
 
-func openPort() port.Port {
+func openPort() (port.Port, error) {
 	if dryRun {
-		return port.OpenDryRun()
+		return port.OpenDryRun(), nil
 	}
 
 	if portName == "" {
-		portName = selectPort()
+		selectedPort, err := selectPort()
+		if err != nil {
+			return nil, err
+		}
+		portName = selectedPort
 	}
 	p, err := port.Open(portName)
 	if err != nil {
-		Fatal(fmt.Sprintf("error: open port: %v", err))
+		return nil, fmt.Errorf("error: open port: %v", err)
 	}
-	return p
+	return p, nil
 }
 
-func selectPort() string {
+func selectPort() (string, error) {
 	portNames, err := port.List()
 	if err != nil {
-		Fatal(fmt.Sprintf("error: list ports: %v", err))
+		return "", fmt.Errorf("error: list ports: %v", err)
 	}
 	return Select("select port:", portNames, "")
-}
-
-func Fatal(msg string) {
-	fmt.Println(msg)
-	os.Exit(1)
 }

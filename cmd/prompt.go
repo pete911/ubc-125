@@ -5,7 +5,7 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 )
 
-func SelectNum(msg string, min, max int, def string) string {
+func SelectNum(msg string, min, max int, def string) (string, error) {
 	prompt := &survey.Select{
 		Message: msg,
 		Options: getNumSlice(min, max),
@@ -13,12 +13,12 @@ func SelectNum(msg string, min, max int, def string) string {
 	}
 	var out int
 	if err := survey.AskOne(prompt, &out); err != nil {
-		Fatal(fmt.Sprintf("error: %s: %v", msg, err))
+		return "", fmt.Errorf("error: %s: %v", msg, err)
 	}
-	return fmt.Sprintf("%d", out)
+	return fmt.Sprintf("%d", out), nil
 }
 
-func Select(msg string, options []string, def string) string {
+func Select(msg string, options []string, def string) (string, error) {
 	if def == "" {
 		def = options[0]
 	}
@@ -29,9 +29,9 @@ func Select(msg string, options []string, def string) string {
 	}
 	var out string
 	if err := survey.AskOne(prompt, &out); err != nil {
-		Fatal(fmt.Sprintf("error: %s: %v", msg, err))
+		return "", fmt.Errorf("error: %s: %v", msg, err)
 	}
-	return out
+	return out, nil
 }
 
 func getNumSlice(min, max int) []string {

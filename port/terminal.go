@@ -3,7 +3,6 @@ package port
 import (
 	"fmt"
 	"log"
-	"os"
 	"strings"
 )
 
@@ -18,26 +17,27 @@ type Terminal struct {
 	logger *log.Logger
 }
 
-func NewTerminal(logger *log.Logger, port Port) Terminal {
-	return Terminal{logger: logger, port: port}
+func NewTerminal(logger *log.Logger, port Port) (Terminal, error) {
+	t := Terminal{logger: logger, port: port}
+	if _, err := t.WriteE("PRG"); err != nil {
+		t.Close()
+		return Terminal{}, err
+	}
+	return t, nil
 }
 
 func (p Terminal) Close() {
 	if p.port != nil {
+		out, err := p.WriteE("EPG")
+		if err != nil {
+			p.logger.Printf("error: close port: exit program mode: %v", err)
+		}
+		p.logger.Printf("exit program mode: %s", out)
+
 		if err := p.port.Close(); err != nil {
-			p.logger.Printf("close port: %v", err)
+			p.logger.Printf("error: close port: %v", err)
 		}
 	}
-}
-
-func (p Terminal) Write(cmd string, args ...string) string {
-	out, err := p.WriteE(cmd, args...)
-	if err != nil {
-		fmt.Printf("error: write %s command: %v\n", cmd, err)
-		p.Close()
-		os.Exit(1)
-	}
-	return out
 }
 
 func (p Terminal) WriteE(cmd string, args ...string) (string, error) {
