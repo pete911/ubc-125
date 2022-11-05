@@ -29,6 +29,11 @@ var (
 		Short: "weather priority",
 		RunE:  systemWeatherAlertCmdRunE,
 	}
+	systemBacklight = &cobra.Command{
+		Use:   "backlight",
+		Short: "backlight",
+		RunE:  systemBacklightCmdRunE,
+	}
 )
 
 func init() {
@@ -36,6 +41,7 @@ func init() {
 	systemCmd.AddCommand(systemSquelch)
 	systemCmd.AddCommand(systemContrast)
 	systemCmd.AddCommand(systemWeather)
+	systemCmd.AddCommand(systemBacklight)
 }
 
 func systemVolumeCmdRunE(_ *cobra.Command, _ []string) error {
@@ -46,11 +52,11 @@ func systemVolumeCmdRunE(_ *cobra.Command, _ []string) error {
 	defer term.Close()
 
 	cmd := "VOL"
-	defaultVolume, err := term.WriteE(cmd)
+	def, err := term.WriteE(cmd)
 	if err != nil {
 		return err
 	}
-	volume, err := SelectNum("select volume", 0, 15, defaultVolume)
+	volume, err := SelectNum("select volume", 0, 15, def)
 	if err != nil {
 		return err
 	}
@@ -66,11 +72,11 @@ func systemSquelchCmdRunE(_ *cobra.Command, _ []string) error {
 	defer term.Close()
 
 	cmd := "SQL"
-	defaultSquelch, err := term.WriteE(cmd)
+	def, err := term.WriteE(cmd)
 	if err != nil {
 		return err
 	}
-	squelch, err := SelectNum("select squelch (0 - open, 15 - close)", 0, 15, defaultSquelch)
+	squelch, err := SelectNum("select squelch (0 - open, 15 - close)", 0, 15, def)
 	if err != nil {
 		return err
 	}
@@ -86,11 +92,11 @@ func systemContrastCmdRunE(_ *cobra.Command, _ []string) error {
 	defer term.Close()
 
 	cmd := "CNT"
-	defaultContrast, err := term.WriteE(cmd)
+	def, err := term.WriteE(cmd)
 	if err != nil {
 		return err
 	}
-	contrast, err := SelectNum("select lcd contrast", 1, 15, defaultContrast)
+	contrast, err := SelectNum("select lcd contrast", 1, 15, def)
 	if err != nil {
 		return err
 	}
@@ -106,14 +112,37 @@ func systemWeatherAlertCmdRunE(_ *cobra.Command, _ []string) error {
 	defer term.Close()
 
 	cmd := "WXS"
-	defaultAlert, err := term.WriteE(cmd)
+	def, err := term.WriteE(cmd)
 	if err != nil {
 		return err
 	}
-	alert, err := SelectNum("select weather alert (0 - off, 1 - on)", 0, 1, defaultAlert)
+	options := Options{"0": "off", "1": "on"}
+	value, err := Select("select weather alert", options.Values(), options.Value(def))
 	if err != nil {
 		return err
 	}
-	_, err = term.WriteE(cmd, alert)
+	_, err = term.WriteE(cmd, options.Key(value))
+	return err
+}
+
+func systemBacklightCmdRunE(_ *cobra.Command, _ []string) error {
+	term, err := Terminal()
+	if err != nil {
+		return err
+	}
+	defer term.Close()
+
+	cmd := "BLT"
+	def, err := term.WriteE(cmd)
+	if err != nil {
+		return err
+	}
+
+	options := Options{"AO": "Always On", "AF": "Always Off", "KY": "Key Press", "SQ": "Squelch", "KS": "Key+SQL"}
+	value, err := Select("select backlight", options.Values(), options.Value(def))
+	if err != nil {
+		return err
+	}
+	_, err = term.WriteE(cmd, options.Key(value))
 	return err
 }

@@ -6,16 +6,7 @@ import (
 )
 
 func SelectNum(msg string, min, max int, def string) (string, error) {
-	prompt := &survey.Select{
-		Message: msg,
-		Options: getNumSlice(min, max),
-		Default: def,
-	}
-	var out int
-	if err := survey.AskOne(prompt, &out); err != nil {
-		return "", fmt.Errorf("error: %s: %v", msg, err)
-	}
-	return fmt.Sprintf("%d", out), nil
+	return Select(msg, getNumSlice(min, max), def)
 }
 
 func Select(msg string, options []string, def string) (string, error) {
