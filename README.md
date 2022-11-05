@@ -10,8 +10,10 @@ If you are looking for GUI on Windows I would recommend [scan125](https://www.ni
 ```
 Available Commands:
   system      system settings
+    contrast    lcd contrast level
     squelch     squelch level
     volume      volume level
+    weather     weather priority
 
 Global Flags:
   -d, --dry-run   dry run, do not connect

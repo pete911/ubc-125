@@ -19,11 +19,23 @@ var (
 		Short: "squelch level",
 		Run:   systemSquelchCmdRun,
 	}
+	systemContrast = &cobra.Command{
+		Use:   "contrast",
+		Short: "lcd contrast level",
+		Run:   systemContrastCmdRun,
+	}
+	systemWeather = &cobra.Command{
+		Use:   "weather",
+		Short: "weather priority",
+		Run:   systemWeatherAlertCmdRun,
+	}
 )
 
 func init() {
 	systemCmd.AddCommand(systemVolume)
 	systemCmd.AddCommand(systemSquelch)
+	systemCmd.AddCommand(systemContrast)
+	systemCmd.AddCommand(systemWeather)
 }
 
 func systemVolumeCmdRun(_ *cobra.Command, _ []string) {
@@ -44,4 +56,24 @@ func systemSquelchCmdRun(_ *cobra.Command, _ []string) {
 	defaultSquelch := term.Write(cmd)
 	squelch := SelectNum("select squelch (0 - open, 15 - close)", 0, 15, defaultSquelch)
 	term.Write(cmd, squelch)
+}
+
+func systemContrastCmdRun(_ *cobra.Command, _ []string) {
+	term := Terminal()
+	defer term.Close()
+
+	cmd := "CNT"
+	defaultContrast := term.Write(cmd)
+	contrast := SelectNum("select lcd contrast", 1, 15, defaultContrast)
+	term.Write(cmd, contrast)
+}
+
+func systemWeatherAlertCmdRun(_ *cobra.Command, _ []string) {
+	term := Terminal()
+	defer term.Close()
+
+	cmd := "WXS"
+	defaultAlert := term.Write(cmd)
+	alert := SelectNum("select weather alert (0 - off, 1 - on)", 0, 1, defaultAlert)
+	term.Write(cmd, alert)
 }
