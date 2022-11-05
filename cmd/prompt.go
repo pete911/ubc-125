@@ -6,6 +6,9 @@ import (
 )
 
 func SelectNum(msg string, min, max int, def string) string {
+	if def == "" {
+		def = fmt.Sprintf("%d", min)
+	}
 	prompt := &survey.Select{
 		Message: msg,
 		Options: getNumSlice(min, max),
@@ -19,6 +22,9 @@ func SelectNum(msg string, min, max int, def string) string {
 }
 
 func Select(msg string, options []string, def string) string {
+	if def == "" {
+		def = options[0]
+	}
 	prompt := &survey.Select{
 		Message: msg,
 		Options: options,

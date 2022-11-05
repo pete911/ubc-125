@@ -75,6 +75,21 @@ func (p Terminal) write(in string) error {
 }
 
 func (p Terminal) read() (string, error) {
-	out, err := io.ReadAll(p.port)
-	return strings.TrimSpace(string(out)), err
+	buff := make([]byte, 10)
+	for {
+		n, err := p.port.Read(buff)
+		p.logger.Printf("read: %d bytes", n)
+		if err != nil {
+			if err == io.EOF {
+				p.logger.Print("read: EOF")
+				break
+			}
+			return "", fmt.Errorf("error: read: %w", err)
+		}
+		if n == 0 {
+			p.logger.Print("read: EOF")
+			break
+		}
+	}
+	return strings.TrimSpace(string(buff)), nil
 }
