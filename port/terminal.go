@@ -2,7 +2,6 @@ package port
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strings"
@@ -75,19 +74,19 @@ func (p Terminal) write(in string) error {
 }
 
 func (p Terminal) read() (string, error) {
-	buff := make([]byte, 10)
+	buff := make([]byte, 100)
 	for {
 		n, err := p.port.Read(buff)
 		p.logger.Printf("read: %d bytes", n)
 		if err != nil {
-			if err == io.EOF {
-				p.logger.Print("read: EOF")
-				break
-			}
 			return "", fmt.Errorf("error: read: %w", err)
 		}
 		if n == 0 {
-			p.logger.Print("read: EOF")
+			p.logger.Printf("read: EOF, return")
+			break
+		}
+		if strings.Contains(string(buff[:n]), "\r") {
+			p.logger.Printf("read: line break, return")
 			break
 		}
 	}
