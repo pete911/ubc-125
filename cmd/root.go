@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/pete911/ubc-125/port"
+	"github.com/pete911/ubc-125/prompt"
 	"github.com/spf13/cobra"
 	"io"
 	"log"
@@ -28,6 +29,8 @@ func init() {
 	RootCmd.PersistentFlags().BoolVarP(&dryRun, "dry-run", "d", false, "dry run, do not connect")
 	RootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose, print logs")
 	RootCmd.PersistentFlags().StringVarP(&portName, "port", "p", "", "serial port name")
+
+	RootCmd.AddCommand(infoCmd)
 	RootCmd.AddCommand(systemCmd)
 }
 
@@ -38,12 +41,12 @@ func initLog(verbose bool) {
 	}
 }
 
-func Terminal() (port.Terminal, error) {
+func Terminal(programMode bool) (port.Terminal, error) {
 	p, err := openPort()
 	if err != nil {
 		return port.Terminal{}, err
 	}
-	return port.NewTerminal(logger, p)
+	return port.NewTerminal(logger, p, programMode)
 }
 
 func openPort() (port.Port, error) {
@@ -70,5 +73,5 @@ func selectPort() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error: list ports: %v", err)
 	}
-	return Select("select port:", portNames, "")
+	return prompt.Select("select port:", portNames, "")
 }

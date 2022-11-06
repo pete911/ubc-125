@@ -1,4 +1,6 @@
-package cmd
+package prompt
+
+import "sort"
 
 type Options map[string]string
 
@@ -20,5 +22,6 @@ func (o Options) Values() []string {
 	for _, v := range o {
 		values = append(values, v)
 	}
+	sort.Strings(values)
 	return values
 }

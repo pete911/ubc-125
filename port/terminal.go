@@ -13,31 +13,40 @@ type Port interface {
 }
 
 type Terminal struct {
-	port   Port
-	logger *log.Logger
+	logger      *log.Logger
+	port        Port
+	programMode bool
 }
 
-func NewTerminal(logger *log.Logger, port Port) (Terminal, error) {
-	t := Terminal{logger: logger, port: port}
+func NewTerminal(logger *log.Logger, port Port, programMode bool) (Terminal, error) {
+	t := Terminal{logger: logger, port: port, programMode: programMode}
+	if !programMode {
+		return t, nil
+	}
 	if _, err := t.WriteE("PRG"); err != nil {
 		t.Close()
 		return Terminal{}, err
 	}
+	logger.Print("entered program mode")
 	return t, nil
 }
 
 func (p Terminal) Close() {
-	if p.port != nil {
+	if p.port == nil {
+		p.logger.Print("close port: port is nil, nothing to close")
+		return
+	}
+	if p.programMode {
 		out, err := p.WriteE("EPG")
 		if err != nil {
 			p.logger.Printf("error: close port: exit program mode: %v", err)
 		}
 		p.logger.Printf("exit program mode: %s", out)
-
-		if err := p.port.Close(); err != nil {
-			p.logger.Printf("error: close port: %v", err)
-		}
 	}
+	if err := p.port.Close(); err != nil {
+		p.logger.Printf("error: close port: %v", err)
+	}
+	p.logger.Print("port closed")
 }
 
 func (p Terminal) WriteE(cmd string, args ...string) (string, error) {

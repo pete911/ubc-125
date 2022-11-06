@@ -1,12 +1,26 @@
-package cmd
+package prompt
 
 import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 )
 
+func Confirm(msg string) (bool, error) {
+	ok := false
+	err := survey.AskOne(&survey.Confirm{Message: msg}, &ok)
+	return ok, err
+}
+
 func SelectNum(msg string, min, max int, def string) (string, error) {
 	return Select(msg, getNumSlice(min, max), def)
+}
+
+func SelectOptions(msg string, options Options, def string) (string, error) {
+	value, err := Select(msg, options.Values(), options.Value(def))
+	if err != nil {
+		return "", err
+	}
+	return options.Key(value), nil
 }
 
 func Select(msg string, options []string, def string) (string, error) {

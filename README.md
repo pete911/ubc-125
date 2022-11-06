@@ -9,15 +9,22 @@ If you are looking for GUI on Windows I would recommend [scan125](https://www.ni
 
 ```
 Available Commands:
+  info        system information
   system      system settings
+    backlight   backlight
+    battery     battery charge time
     contrast    lcd contrast level
+    key         key beep and key lock
+    memory      clear all memory
+    priority    priority mode
     squelch     squelch level
     volume      volume level
     weather     weather priority
 
 Global Flags:
-  -d, --dry-run   dry run, do not connect
-  -v, --verbose   verbose, print logs
+  -d, --dry-run     dry run, do not connect
+  -p, --port string serial port name
+  -v, --verbose     verbose, print logs
 ```
 
 ## example
