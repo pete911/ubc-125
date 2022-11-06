@@ -39,6 +39,19 @@ func Select(msg string, options []string, def string) (string, error) {
 	return out, nil
 }
 
+func MultiSelect(msg string, options []string, def []string) ([]string, error) {
+	prompt := &survey.MultiSelect{
+		Message: msg,
+		Options: options,
+		Default: def,
+	}
+	var out []string
+	if err := survey.AskOne(prompt, &out); err != nil {
+		return nil, fmt.Errorf("error: %s: %v", msg, err)
+	}
+	return out, nil
+}
+
 func getNumSlice(min, max int) []string {
 	a := make([]string, max-min+1)
 	for i := range a {

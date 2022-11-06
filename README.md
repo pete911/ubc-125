@@ -10,6 +10,8 @@ If you are looking for GUI on Windows I would recommend [scan125](https://www.ni
 ```
 Available Commands:
   info        system information
+  scan        scan settings
+    group       scan channel group
   system      system settings
     backlight   backlight
     battery     battery charge time

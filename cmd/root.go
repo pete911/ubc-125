@@ -32,6 +32,7 @@ func init() {
 
 	RootCmd.AddCommand(infoCmd)
 	RootCmd.AddCommand(systemCmd)
+	RootCmd.AddCommand(scanCmd)
 }
 
 func initLog(verbose bool) {
