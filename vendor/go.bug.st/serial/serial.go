@@ -1,5 +1,5 @@
 //
-// Copyright 2014-2021 Cristian Maglie. All rights reserved.
+// Copyright 2014-2023 Cristian Maglie. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 //
@@ -26,6 +26,9 @@ type Port interface {
 	// Returns the number of bytes written.
 	Write(p []byte) (n int, err error)
 
+	// Wait until all data in the buffer are sent
+	Drain() error
+
 	// ResetInputBuffer Purges port read buffer
 	ResetInputBuffer() error
 
@@ -48,6 +51,9 @@ type Port interface {
 
 	// Close the serial port
 	Close() error
+
+	// Break sends a break for a determined time
+	Break(time.Duration) error
 }
 
 // NoTimeout should be used as a parameter to SetReadTimeout to disable timeout.
@@ -74,7 +80,13 @@ type ModemOutputBits struct {
 
 // Open opens the serial port using the specified modes
 func Open(portName string, mode *Mode) (Port, error) {
-	return nativeOpen(portName, mode)
+	port, err := nativeOpen(portName, mode)
+	if err != nil {
+		// Return a nil interface, for which var==nil is true (instead of
+		// a nil pointer to a struct that satisfies the interface).
+		return nil, err
+	}
+	return port, err
 }
 
 // GetPortsList retrieve the list of available serial ports

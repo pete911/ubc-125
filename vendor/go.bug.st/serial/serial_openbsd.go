@@ -1,5 +1,5 @@
 //
-// Copyright 2014-2021 Cristian Maglie. All rights reserved.
+// Copyright 2014-2023 Cristian Maglie. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 //
@@ -56,6 +56,8 @@ const tcCRTSCTS uint32 = tcCCTS_OFLOW
 const ioctlTcgetattr = unix.TIOCGETA
 const ioctlTcsetattr = unix.TIOCSETA
 const ioctlTcflsh = unix.TIOCFLUSH
+const ioctlTioccbrk = unix.TIOCCBRK
+const ioctlTiocsbrk = unix.TIOCSBRK
 
 func toTermiosSpeedType(speed uint32) int32 {
 	return int32(speed)

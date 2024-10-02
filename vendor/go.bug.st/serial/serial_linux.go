@@ -1,5 +1,5 @@
 //
-// Copyright 2014-2021 Cristian Maglie. All rights reserved.
+// Copyright 2014-2023 Cristian Maglie. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 //
@@ -9,7 +9,7 @@ package serial
 import "golang.org/x/sys/unix"
 
 const devFolder = "/dev"
-const regexFilter = "(ttyS|ttyUSB|ttyACM|ttyAMA|rfcomm|ttyO|ttymxc)[0-9]{1,3}"
+const regexFilter = "(ttyS|ttyHS|ttyUSB|ttyACM|ttyAMA|rfcomm|ttyO|ttymxc)[0-9]{1,3}"
 
 // termios manipulation functions
 
@@ -63,6 +63,8 @@ const tcCRTSCTS uint32 = unix.CRTSCTS
 const ioctlTcgetattr = unix.TCGETS
 const ioctlTcsetattr = unix.TCSETS
 const ioctlTcflsh = unix.TCFLSH
+const ioctlTioccbrk = unix.TIOCCBRK
+const ioctlTiocsbrk = unix.TIOCSBRK
 
 func toTermiosSpeedType(speed uint32) uint32 {
 	return speed
@@ -82,4 +84,11 @@ func setTermSettingsBaudrate(speed int, settings *unix.Termios) (error, bool) {
 	settings.Ispeed = toTermiosSpeedType(baudrate)
 	settings.Ospeed = toTermiosSpeedType(baudrate)
 	return nil, false
+}
+
+func (port *unixPort) Drain() error {
+	// It's not super well documented, but this is the same as calling tcdrain:
+	// - https://git.musl-libc.org/cgit/musl/tree/src/termios/tcdrain.c
+	// - https://elixir.bootlin.com/linux/v6.2.8/source/drivers/tty/tty_io.c#L2673
+	return unix.IoctlSetInt(port.handle, unix.TCSBRK, 1)
 }
